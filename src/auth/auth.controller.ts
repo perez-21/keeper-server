@@ -24,6 +24,16 @@ export class AuthController {
     return this.authService.logout(body);
   }
 
+  // @Get('oauth/google')
+  // async googleAuth() {
+  //   return this.authService.googleAuth();
+  // }
+
+  // @Get('oauth/google/callback')
+  // async googleAuthRedirect(@Query() query: any) {
+  //   return this.authService.googleAuthRedirect(query);
+  // }
+
   // @Get('me')
   // me(@GetUser() user: User) {
   //   return await this.authService.getCurrentUser(user);

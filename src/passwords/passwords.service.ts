@@ -1,26 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePasswordDto } from './dto/create-password.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
-
+import { CreatePasswordDto, UpdatePasswordDto } from './dto/index';
+import { PrismaService } from '../prisma/prisma.service';
+import { HashManager } from '../crypt/HashManager.service';
 @Injectable()
 export class PasswordsService {
-  create(createPasswordDto: CreatePasswordDto) {
-    return 'This action adds a new password';
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly hashManager: HashManager,
+  ) {}
+  async create(createPasswordDto: CreatePasswordDto) {
+    // createPasswordDto.password = await this.hashManager.hashPassword(
+    //   createPasswordDto.password,
+    // );
+    return this.prisma.password.create({
+      data: createPasswordDto,
+    });
   }
 
   findAll() {
-    return `This action returns all passwords`;
+    return this.prisma.password.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} password`;
+  findOne(id: string) {
+    return this.prisma.password.findUnique({
+      where: { id },
+    });
   }
 
-  update(id: number, updatePasswordDto: UpdatePasswordDto) {
-    return `This action updates a #${id} password`;
+  update(id: string, updatePasswordDto: UpdatePasswordDto) {
+    return this.prisma.password.update({
+      where: { id },
+      data: updatePasswordDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} password`;
+  remove(id: string) {
+    return this.prisma.password.delete({
+      where: { id },
+    });
   }
 }

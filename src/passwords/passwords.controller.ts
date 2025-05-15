@@ -8,8 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { PasswordsService } from './passwords.service';
-import { CreatePasswordDto } from './dto/create-password.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
+import { CreatePasswordDto, UpdatePasswordDto } from './dto/index';
 
 @Controller('passwords')
 export class PasswordsController {
@@ -27,7 +26,7 @@ export class PasswordsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.passwordsService.findOne(+id);
+    return this.passwordsService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +34,11 @@ export class PasswordsController {
     @Param('id') id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
-    return this.passwordsService.update(+id, updatePasswordDto);
+    return this.passwordsService.update(id, updatePasswordDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.passwordsService.remove(+id);
+    return this.passwordsService.remove(id);
   }
 }
