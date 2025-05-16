@@ -1,13 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CredentialsDto, RegisterDto } from './dtos';
-import * as bcrypt from 'bcrypt';
 import { HashManager } from '../crypt/HashManager.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly hashManager: HashManager,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async register(createUserDto: RegisterDto) {
@@ -25,9 +28,11 @@ export class AuthService {
       createUserDto.password,
     );
 
-    return await this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: createUserDto,
     });
+
+    return await this.signToken(user.id, user.email);
   }
 
   async login(loginDto: CredentialsDto) {
@@ -50,15 +55,22 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials');
     }
 
-    // authenticate user
-    return { message: 'logged in' };
+    // generate token
+    return await this.signToken(user.id, user.email);
   }
 
-  logout(body: any) {
-    return { message: 'logged out' };
+  async signToken(userId: string, email: string) {
+    const access_token = await this.jwtService.signAsync(
+      { sub: userId, email },
+      {
+        expiresIn: '3h',
+        secret: this.configService.get('JWT_SECRET'),
+      },
+    );
+    return { access_token };
   }
 
-  async getCurrentUser(user: any) {
-    return { status: 'successful', id: 'userid1234', name: 'John Doe' };
+  getCurrentUser(user: Omit<RegisterDto, 'password'>) {
+    return user;
   }
 }

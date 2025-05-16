@@ -1,9 +1,15 @@
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, CredentialsDto } from './dtos';
-// import { User } from '@prisma/client';
-// import { GetUser } from './decorators/get-user.decorator';
-// import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { GetUser } from './decorators/index';
 
 @Controller('auth')
 export class AuthController {
@@ -19,23 +25,9 @@ export class AuthController {
     return await this.authService.login(loginDto);
   }
 
-  @Post('logout')
-  logout(@Body() body: any) {
-    return this.authService.logout(body);
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getProfile(@GetUser() user: Omit<RegisterDto, 'password'>) {
+    return this.authService.getCurrentUser(user);
   }
-
-  // @Get('oauth/google')
-  // async googleAuth() {
-  //   return this.authService.googleAuth();
-  // }
-
-  // @Get('oauth/google/callback')
-  // async googleAuthRedirect(@Query() query: any) {
-  //   return this.authService.googleAuthRedirect(query);
-  // }
-
-  // @Get('me')
-  // me(@GetUser() user: User) {
-  //   return await this.authService.getCurrentUser(user);
-  // }
 }

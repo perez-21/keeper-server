@@ -17,26 +17,26 @@ export class PasswordsService {
     });
   }
 
-  findAll() {
-    return this.prisma.password.findMany();
+  findAll(userId: string) {
+    return this.prisma.password.findMany({ where: { userId } });
   }
 
-  findOne(id: string) {
+  findOne(id: string, userId: string) {
     return this.prisma.password.findUnique({
-      where: { id },
+      where: { id, userId },
     });
   }
 
-  update(id: string, updatePasswordDto: UpdatePasswordDto) {
+  update(id: string, updatePasswordDto: UpdatePasswordDto, userId: string) {
     return this.prisma.password.update({
-      where: { id },
+      where: { id, userId },
       data: updatePasswordDto,
     });
   }
 
-  remove(id: string) {
+  remove(id: string, userId: string) {
     return this.prisma.password.delete({
-      where: { id },
+      where: { id, userId },
     });
   }
 }
